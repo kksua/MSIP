@@ -1,1 +1,101 @@
 /* map styles placeholder */
+.map-frame {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.86));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 12px;
+}
+
+.map {
+  width: 100%;
+  height: calc(100vh - 130px);
+  min-height: 550px;
+  border-radius: calc(var(--radius-xl) - 8px);
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(36, 107, 255, 0.08), rgba(255, 255, 255, 0.6));
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  font-family: inherit;
+  background: #dbe7f3;
+}
+
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 10px 24px rgba(16, 32, 51, 0.15) !important;
+  overflow: hidden;
+  border-radius: 14px !important;
+}
+
+.leaflet-control-zoom a {
+  width: 38px !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  font-size: 1.1rem !important;
+  color: var(--text) !important;
+  border: none !important;
+}
+
+.leaflet-control-attribution {
+  padding: 4px 8px !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text-soft) !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #ffffff;
+}
+
+.custom-pin {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #246bff 0%, #4f8cff 100%);
+  border: 3px solid rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 18px rgba(36, 107, 255, 0.35);
+}
+
+@media (max-width: 1024px) {
+  .map {
+    height: calc(100vh - 210px);
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .map-frame {
+    padding: 10px;
+    border-radius: 20px;
+  }
+
+  .map {
+    height: calc(100vh - 230px);
+    min-height: 340px;
+    border-radius: 14px;
+  }
+
+  .leaflet-control-zoom a {
+    width: 34px !important;
+    height: 34px !important;
+    line-height: 34px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .map {
+    height: calc(100vh - 250px);
+    min-height: 300px;
+  }
+}

@@ -1,1 +1,116 @@
 /* component styles placeholder */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-height: var(--topbar-height);
+  display: flex;
+  align-items: center;
+  padding: 14px var(--page-padding);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(248, 251, 255, 0.72);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.brand-wrap {
+  width: min(100%, var(--content-max));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(135deg, #246bff 0%, #4f8cff 100%);
+  box-shadow: 0 10px 24px rgba(36, 107, 255, 0.28);
+  flex-shrink: 0;
+}
+
+.brand-text {
+  min-width: 0;
+}
+
+.app-title {
+  margin: 0;
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.app-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.92rem;
+  color: var(--text-soft);
+}
+
+.hero-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--success);
+  box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.12);
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    min-height: auto;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .brand-wrap {
+    align-items: flex-start;
+  }
+
+  .brand-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .app-subtitle {
+    font-size: 0.84rem;
+  }
+
+  .hero-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-chip {
+    white-space: normal;
+  }
+}

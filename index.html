@@ -1,10 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="Montgomery Neighborhood Risk Explorer"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' https://unpkg.com;
+        style-src 'self' 'unsafe-inline' https://unpkg.com;
+        img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://unpkg.com;
+        font-src 'self' data:;
+        connect-src 'self' https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://unpkg.com https://gis.montgomeryal.gov https://services7.arcgis.com;
+      "
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
     <title>Montgomery Neighborhood Risk Explorer</title>
-</head>
-<body>
-    <!-- initial structure only -->
-</body>
+
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/components.css" />
+    <link rel="stylesheet" href="./css/map.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-badge" aria-hidden="true">MR</div>
+          <div class="brand-text">
+            <h1 class="app-title">Montgomery Neighborhood Risk Explorer</h1>
+            <p class="app-subtitle">
+              Civic intelligence dashboard for neighborhood-level signals
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-content">
+        <section class="hero-card" aria-label="Map section">
+          <div class="hero-card__header">
+            <div>
+              <p class="eyebrow">Live Map View</p>
+              <h2 class="section-title">Montgomery, Alabama</h2>
+            </div>
+
+            <div class="status-chip" aria-label="Map loading status">
+              <span class="status-dot"></span>
+              Interactive map ready
+            </div>
+          </div>
+
+          <div class="map-frame">
+            <div
+              id="map"
+              class="map"
+              role="application"
+              aria-label="Leaflet map of Montgomery"
+            ></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="./js/main.js"></script>
+  </body>
 </html>
