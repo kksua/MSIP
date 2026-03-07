@@ -30,8 +30,8 @@
   font-size: 0.95rem;
   font-weight: 800;
   color: #ffffff;
-  background: linear-gradient(135deg, #246bff 0%, #4f8cff 100%);
-  box-shadow: 0 10px 24px rgba(36, 107, 255, 0.28);
+  background: linear-gradient(135deg, #003366 0%, #004080 100%);
+  box-shadow: 0 10px 24px rgba(0, 51, 102, 0.28);
   flex-shrink: 0;
 }
 
@@ -113,4 +113,182 @@
   .status-chip {
     white-space: normal;
   }
+}
+
+/* Dashboard Section */
+.dashboard-section {
+  margin-bottom: 32px;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.dashboard-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.last-updated {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.metric-card {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.metric-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.metric-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .metric-card {
+    padding: 20px;
+  }
+
+  .metric-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .metric-value {
+    font-size: 2rem;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* Marker Clustering Styles */
+.marker-cluster-small {
+  background-color: rgba(0, 51, 102, 0.6);
+  border: 2px solid #003366;
+}
+
+.marker-cluster-small div {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #003366;
+  font-weight: 700;
+}
+
+.marker-cluster-medium {
+  background-color: rgba(0, 51, 102, 0.7);
+  border: 2px solid #003366;
+}
+
+.marker-cluster-medium div {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #003366;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.marker-cluster-large {
+  background-color: rgba(0, 51, 102, 0.8);
+  border: 2px solid #003366;
+}
+
+.marker-cluster-large div {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #003366;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.marker-cluster {
+  border-radius: 50%;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 51, 102, 0.3);
+}
+
+.marker-cluster:hover {
+  background-color: rgba(0, 51, 102, 0.9);
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+.marker-cluster div {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+
+/* Vacant Properties Cluster Styling */
+.marker-cluster-vacant {
+  background-color: rgba(105, 105, 105, 0.7);
+  border: 2px solid #696969;
+}
+
+.marker-cluster-vacant div {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #696969;
+  font-weight: 700;
 }

@@ -8,7 +8,7 @@
     />
     <meta
       name="description"
-      content="Montgomery Neighborhood Risk Explorer"
+      content="Safety CityPulse - Civic intelligence for Montgomery, AL"
     />
     <meta
       http-equiv="Content-Security-Policy"
@@ -18,17 +18,13 @@
         style-src 'self' 'unsafe-inline' https://unpkg.com;
         img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://unpkg.com;
         font-src 'self' data:;
-        connect-src 'self' https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://unpkg.com https://gis.montgomeryal.gov https://services7.arcgis.com;
+        connect-src 'self' https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://unpkg.com https://gis.montgomeryal.gov https://services7.arcgis.com https://generativelanguage.googleapis.com;
       "
     />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
 
-    <title>Montgomery Neighborhood Risk Explorer</title>
-
-    <link rel="stylesheet" href="./css/main.css" />
-    <link rel="stylesheet" href="./css/components.css" />
-    <link rel="stylesheet" href="./css/map.css" />
+    <title>Safety CityPulse</title>
 
     <link
       rel="stylesheet"
@@ -36,45 +32,394 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin="anonymous"
     />
+
+    <!-- Marker Clustering -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+    />
+
+    <style>
+      :root {
+        --header-bg: #0F2747;
+        --header-text: #fff;
+        --sidebar-bg: #fff;
+        --sidebar-border: #e0e0e0;
+        --badge-grad: linear-gradient(135deg, #1F3A63 0%, #4E6F9F 100%);
+        --accent: #CFA64A;
+        --body-bg: #f4f7fb;
+      }
+      * {
+        box-sizing: border-box;
+        font-family: Inter, system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        background: var(--body-bg);
+        color: #102033;
+      }
+      .topbar {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        background: var(--header-bg);
+        color: var(--header-text);
+        z-index: 1000;
+      }
+      .hamburger {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--header-text);
+        font-size: 1.5rem;
+        cursor: pointer;
+        margin-right: 12px;
+      }
+      .brand-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand-badge {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        color: #fff;
+        background: var(--badge-grad);
+        flex-shrink: 0;
+      }
+      .brand-text h1 {
+        margin: 0;
+        font-size: 1.2rem;
+        letter-spacing: -0.02em;
+      }
+      .brand-text p {
+        margin: 2px 0 0;
+        font-size: 0.9rem;
+      }
+      .app-shell {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      .content-row {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+        position: relative;
+      }
+      .sidebar {
+        width: 280px;
+        flex-shrink: 0;
+        overflow-y: auto;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--sidebar-border);
+        padding: 20px;
+      }
+      .sidebar section {
+        margin-bottom: 24px;
+      }
+      .sidebar h3 {
+        margin: 0 0 12px;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #5d6b7c;
+      }
+      .filters label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .filters select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        font-size: 14px;
+        transition: border-color 0.2s;
+      }
+      .filters select:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .filters input[type="checkbox"] {
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        margin-right: 10px;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .filters input[type="checkbox"]:checked {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .filters input[type="checkbox"]:checked::after {
+        content: '✓';
+        color: #fff;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+      }
+      .filters fieldset {
+        border: none;
+        padding: 0;
+        margin: 16px 0 0;
+      }
+      .filters legend {
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #333;
+      }
+      .legend div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .legend span {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+      .button {
+        display: inline-block;
+        padding: 8px 16px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-align: center;
+      }
+      .map-container {
+        flex: 1;
+        position: relative;
+      }
+      .map-frame {
+        height: 100%;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+      }
+      .hidden { display: none !important; }
+      #map {
+        width: 100%;
+        height: 100%;
+      }
+      .detail-panel {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 320px;
+        background: #fff;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.08);
+        overflow-y: auto;
+        padding: 20px;
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+        z-index: 500;
+      }
+      .detail-panel.open {
+        transform: translateX(0);
+      }
+      .detail-panel .close-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        border: none;
+        background: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #5d6b7c;
+      }
+      .detail-panel h2 {
+        margin: 0 0 12px;
+        font-size: 1.15rem;
+      }
+      .risk-score {
+        font-size: 2.5rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .risk-badge {
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        color: #fff;
+      }
+      .breakdown {
+        margin-top: 16px;
+      }
+      .breakdown-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .breakdown-row svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        margin-right: 8px;
+      }
+      /* Mobile */
+      @media (max-width: 768px) {
+        .hamburger {
+          display: block;
+        }
+        .sidebar {
+          position: absolute;
+          left: -100%;
+          top: 0;
+          height: 100%;
+          z-index: 1100;
+          transition: left 0.3s ease;
+        }
+        .sidebar.open {
+          left: 0;
+        }
+        .detail-panel {
+          width: 100%;
+          height: 50%;
+          bottom: 0;
+          top: auto;
+          right: auto;
+          left: 0;
+          transform: translateY(100%);
+          position: fixed;
+          z-index: 1200;
+        }
+        .detail-panel.open {
+          transform: translateY(0);
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="app-shell">
       <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">☰</button>
         <div class="brand-wrap">
-          <div class="brand-badge" aria-hidden="true">MR</div>
+          <div class="brand-badge" aria-hidden="true">SCP</div>
           <div class="brand-text">
-            <h1 class="app-title">Montgomery Neighborhood Risk Explorer</h1>
-            <p class="app-subtitle">
-              Civic intelligence dashboard for neighborhood-level signals
-            </p>
+            <h1>Safety CityPulse</h1>
+            <p>Civic intelligence for Montgomery, AL</p>
           </div>
         </div>
       </header>
-
-      <main class="page-content">
-        <section class="hero-card" aria-label="Map section">
-          <div class="hero-card__header">
-            <div>
-              <p class="eyebrow">Live Map View</p>
-              <h2 class="section-title">Montgomery, Alabama</h2>
-            </div>
-
-            <div class="status-chip" aria-label="Map loading status">
-              <span class="status-dot"></span>
-              Interactive map ready
-            </div>
-          </div>
-
+      <div class="content-row">
+        <aside class="sidebar" id="sidebar">
+          <section class="filters">
+            <h3>Filters</h3>
+            <label for="time-range">Time range</label>
+            <select id="time-range" aria-label="Select time range">
+              <option value="7">7 days</option>
+              <option value="30" selected>30 days</option>
+              <option value="60">60 days</option>
+              <option value="90">90 days</option>
+            </select>
+            <fieldset>
+              <legend>Layers</legend>
+              <label><input type="checkbox" checked class="layer-toggle" id="layer-911" name="calls911" aria-label="Toggle 911 Calls layer" /> 911 Calls</label><br />
+              <label><input type="checkbox" checked class="layer-toggle" id="layer-311" name="requests311" aria-label="Toggle 311 Requests layer" /> 311 Requests</label><br />
+              <label><input type="checkbox" checked class="layer-toggle" id="layer-violations" name="violations" aria-label="Toggle Code Violations layer" /> Code Violations</label><br />
+              <label><input type="checkbox" checked class="layer-toggle" id="layer-vacant" name="vacant" aria-label="Toggle Vacant Properties layer" /> Vacant Properties</label>
+            </fieldset>
+            <button class="button" id="apply-filters" aria-label="Apply selected filters">Apply Filters</button>
+          </section>
+          <section class="legend">
+            <h3>Legend</h3>
+            <div><span style="background: #3FB27F;"></span> Low</div>
+            <div><span style="background: #F4B942;"></span> Moderate</div>
+            <div><span style="background: #E55353;"></span> Emerging</div>
+          </section>
+          <section class="data-status">
+            <h3>Data Status</h3>
+            <div id="data-status" aria-live="polite"></div>
+          </section>
+        </aside>
+        <div class="map-container">
           <div class="map-frame">
-            <div
-              id="map"
-              class="map"
-              role="application"
-              aria-label="Leaflet map of Montgomery"
-            ></div>
+            <div id="map" role="application" aria-label="Leaflet map of Montgomery"></div>
+            <div id="loading-overlay" class="hidden" style="position:absolute;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.65);font-weight:600;color:#333;pointer-events:none;">Loading…</div>
           </div>
-        </section>
-      </main>
+        </div>
+        <aside class="detail-panel" id="detail-panel" aria-hidden="true">
+          <button class="close-btn" id="detail-close" aria-label="Close details">×</button>
+          <h2>Area Details</h2>
+          <div class="risk-score">
+            <span id="risk-value">--</span>
+            <span id="risk-badge" class="risk-badge"></span>
+          </div>
+          <div class="breakdown" id="breakdown">
+            <div class="breakdown-row">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              <span>911 Calls</span>
+              <span id="breakdown-911">--</span>
+            </div>
+            <div class="breakdown-row">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
+              <span>311 Requests</span>
+              <span id="breakdown-311">--</span>
+            </div>
+            <div class="breakdown-row">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <span>Code Violations</span>
+              <span id="breakdown-violations">--</span>
+            </div>
+            <div class="breakdown-row">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 21V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14"/>
+                <path d="M3 21h18"/>
+                <path d="M9 21V9"/>
+                <path d="M15 21V9"/>
+                <path d="M21 9H3"/>
+              </svg>
+              <span>Vacant Properties</span>
+              <span id="breakdown-vacant">--</span>
+            </div>
+          </div>
+          <div id="trend-section" style="display: none;">
+            <h3>Trends</h3>
+            <div id="trend-content"></div>
+          </div>
+          <button class="button" id="ai-insight-btn" disabled aria-label="Get AI explanation for this area">Explain This Area</button>
+          <div id="ai-insight-text"></div>
+        </aside>
+      </div>
     </div>
 
     <script
@@ -82,6 +427,10 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin="anonymous"
     ></script>
-    <script type="module" src="./js/main.js"></script>
+
+    <!-- Marker Clustering -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+    <script type="module" src="js/main.js"></script>
   </body>
 </html>
