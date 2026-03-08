@@ -40,7 +40,7 @@ export const API_ENDPOINTS = {
 // Feature flags
 export const ENABLE_HEX_GRID = true;
 export const ENABLE_AI_INSIGHTS = false;
-export const ENABLE_BRIGHT_DATA = false;
+export const ENABLE_BRIGHT_DATA = true;
 export const ENABLE_TREND_DETECTION = false;
 export const DEBUG_MODE = true;
 

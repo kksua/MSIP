@@ -25,7 +25,7 @@ export class GeminiAPI {
     return typeof this.apiKey === 'string' && this.apiKey.trim() !== '';
   }
 
-  async generateInsight(cellData) {
+  async generateInsight(cellData, newsContext = null) {
     const riskScore = Number(cellData?.riskScore ?? 0);
     const riskLevel = cellData?.riskLevel ?? 'Unknown';
     const counts = {
@@ -68,6 +68,7 @@ export class GeminiAPI {
       `- Vacant Properties: ${counts.vacant}`,
       '',
       `Neighborhood Risk Score: ${riskScore} (${riskLevel})`,
+      ...(newsContext ? ['', 'Recent local news context:', newsContext] : []),
       '',
       'Provide a concise, plain-language explanation of what this data suggests about conditions in this area.',
     ].join('\n');

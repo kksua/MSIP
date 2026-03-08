@@ -5,6 +5,7 @@
 
 import { montgomeryDataAPI } from "./services/MontgomeryDataAPI.js";
 import { geminiAPI } from "./services/GeminiAPI.js";
+import { fetchLocalNewsForCell } from "./services/NewsAPI.js";
 import { generateHexGrid, buildGridSummary } from "./utils/dataProcessor.js";
 import { computeRiskScores, getScoreBreakdown } from "./logic/riskScoringEngine.js";
 import { getRiskLevel } from "./utils/normalization.js";
@@ -24,6 +25,11 @@ let currentLayers = {
 let debounceTimer;
 let selectedHexId = null;
 let selectedCellData = null;
+
+// News state
+let newsAbortController = null; // cancelled when user picks a different cell
+let newsFetchTimer = null;       // 400 ms debounce before firing the news fetch
+let currentNewsContext = null;   // last fetched headlines as plain text, fed to Gemini
 
 // Viewport / API fetch bounds — wider area so pan still loads data
 const MONTGOMERY_BOUNDS = L.latLngBounds([[32.2, -86.5], [32.5, -86.1]]);
@@ -116,7 +122,7 @@ async function handleExplainArea() {
   });
 
   try {
-    const insight = await geminiAPI.generateInsight(selectedCellData);
+    const insight = await geminiAPI.generateInsight(selectedCellData, currentNewsContext);
     const isErrorMessage =
       typeof insight === "string" &&
       (insight.includes("temporarily unavailable") ||
@@ -135,6 +141,88 @@ async function handleExplainArea() {
       error: true,
     });
   }
+}
+
+// ---------------------------------------------------------------------------
+// News / Local Context
+// ---------------------------------------------------------------------------
+
+function resetNewsPanel() {
+  clearTimeout(newsFetchTimer);
+  if (newsAbortController) {
+    newsAbortController.abort();
+    newsAbortController = null;
+  }
+  currentNewsContext = null;
+  document.getElementById("news-section").style.display = "none";
+  document.getElementById("news-list").innerHTML = "";
+  document.getElementById("news-status").textContent = "";
+  document.getElementById("news-retry").style.display = "none";
+}
+
+function _setNewsError() {
+  document.getElementById("news-status").textContent = "Local context unavailable right now.";
+  document.getElementById("news-retry").style.display = "inline-block";
+}
+
+function _renderHeadlines(headlines) {
+  const list = document.getElementById("news-list");
+  list.innerHTML = headlines.map((item) => {
+    const date = item.publishedAt
+      ? new Date(item.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+      : null;
+    const meta = [item.source, date].filter(Boolean).join(" · ");
+    return `<li>
+      <a class="news-title" href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+      ${meta ? `<span class="news-meta">${meta}</span>` : ""}
+    </li>`;
+  }).join("");
+
+  // Build plain-text summary for Gemini context (titles only)
+  currentNewsContext = headlines
+    .map((h) => `- ${h.title}${h.source ? ` (${h.source})` : ""}`)
+    .join("\n");
+}
+
+function loadLocalNews(cell) {
+  const section = document.getElementById("news-section");
+
+  // Cancel any in-flight fetch from a previous cell
+  if (newsAbortController) newsAbortController.abort();
+  clearTimeout(newsFetchTimer);
+  currentNewsContext = null;
+
+  // Show section immediately with loading state
+  section.style.display = "block";
+  document.getElementById("news-status").textContent = "Loading local context…";
+  document.getElementById("news-list").innerHTML = "";
+  document.getElementById("news-retry").style.display = "none";
+
+  const lat = Array.isArray(cell.center) ? cell.center[0] : cell.center?.lat;
+  const lng = Array.isArray(cell.center) ? cell.center[1] : cell.center?.lng;
+
+  // 400 ms debounce — skip fast clicks
+  newsFetchTimer = setTimeout(async () => {
+    newsAbortController = new AbortController();
+    try {
+      const headlines = await fetchLocalNewsForCell(lat, lng, {
+        signal: newsAbortController.signal,
+      });
+
+      if (headlines.length === 0) {
+        document.getElementById("news-status").textContent = "No recent local news found.";
+      } else {
+        document.getElementById("news-status").textContent = "";
+        _renderHeadlines(headlines);
+      }
+    } catch (err) {
+      if (err.name === "AbortError") return; // user moved to another cell — silent
+      console.error("[News] fetch error:", err);
+      _setNewsError();
+    } finally {
+      newsAbortController = null;
+    }
+  }, 400);
 }
 
 // Initialize the application
@@ -185,6 +273,11 @@ function init() {
     panel.classList.remove("open");
     panel.setAttribute("aria-hidden", "true");
     setAIInsightState({ text: "", loading: false, error: false });
+    resetNewsPanel();
+  });
+
+  document.getElementById("news-retry").addEventListener("click", () => {
+    if (selectedCellData) loadLocalNews({ center: selectedCellData.center });
   });
 
   document.getElementById("ai-insight-btn").addEventListener("click", handleExplainArea);
@@ -285,6 +378,7 @@ function showDetailPanel(cell) {
   panel.setAttribute("aria-hidden", "false");
 
   setAIInsightState({ text: "", loading: false, error: false });
+  loadLocalNews(cell);
 }
 
 // Show detail panel in empty/no-data state

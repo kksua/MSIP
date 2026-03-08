@@ -1,91 +1,169 @@
-/* map styles placeholder */
-.map-frame {
+/* css/map.css */
+
+/* ─── Map Container ──────────────────────────────────────────────────────── */
+.map-container {
+  flex: 1;
   position: relative;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.86));
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  padding: 12px;
+  min-width: 0;
 }
 
-.map {
-  width: 100%;
-  height: calc(100vh - 130px);
-  min-height: 550px;
-  border-radius: calc(var(--radius-xl) - 8px);
+.map-frame {
+  height: 100%;
+  position: relative;
   overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(36, 107, 255, 0.08), rgba(255, 255, 255, 0.6));
+  border: 1px solid var(--border);
 }
 
+#map {
+  width: 100%;
+  height: 100%;
+  background: #dce8f3;
+}
+
+/* ─── Loading Overlay (map-scoped) ──────────────────────────────────────── */
+#loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(244, 247, 251, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  font-weight: 600;
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+#loading-overlay::before {
+  content: '';
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(31, 58, 99, 0.15);
+  border-top-color: var(--civic-blue);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Leaflet Base Overrides ─────────────────────────────────────────────── */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  border-radius: inherit;
-  font-family: inherit;
-  background: #dbe7f3;
+  font-family: Inter, system-ui, sans-serif;
+  background: #dce8f3;
 }
 
+/* ─── Zoom Controls ──────────────────────────────────────────────────────── */
 .leaflet-control-zoom {
   border: none !important;
-  box-shadow: 0 10px 24px rgba(16, 32, 51, 0.15) !important;
+  border-radius: var(--radius-md) !important;
   overflow: hidden;
-  border-radius: 14px !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 .leaflet-control-zoom a {
-  width: 38px !important;
-  height: 38px !important;
-  line-height: 38px !important;
-  font-size: 1.1rem !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 1rem !important;
   color: var(--text) !important;
+  background: var(--surface) !important;
   border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  transition: background 0.15s !important;
 }
 
+.leaflet-control-zoom a:last-child {
+  border-bottom: none !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--bg) !important;
+  color: var(--civic-blue) !important;
+}
+
+/* ─── Attribution ────────────────────────────────────────────────────────── */
 .leaflet-control-attribution {
-  padding: 4px 8px !important;
-  border-radius: 10px !important;
-  background: rgba(255, 255, 255, 0.78) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: var(--text-soft) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 3px 8px !important;
+  font-size: var(--fs-caption) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
 }
 
-.leaflet-popup-content-wrapper,
+.leaflet-control-attribution a {
+  color: var(--civic-blue) !important;
+}
+
+/* ─── Popups ─────────────────────────────────────────────────────────────── */
+.leaflet-popup-content-wrapper {
+  background: var(--surface) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border: 1px solid var(--border) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 14px 16px !important;
+  font-family: Inter, system-ui, sans-serif !important;
+  font-size: var(--fs-body) !important;
+  color: var(--text) !important;
+  line-height: 1.5 !important;
+}
+
+.leaflet-popup-tip-container {
+  margin-top: -1px;
+}
+
 .leaflet-popup-tip {
-  background: #ffffff;
+  background: var(--surface) !important;
+  box-shadow: none !important;
 }
 
+.leaflet-popup-close-button {
+  color: var(--text-secondary) !important;
+  font-size: 1.1rem !important;
+  top: 8px !important;
+  right: 10px !important;
+  transition: color 0.15s !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--text) !important;
+}
+
+/* ─── Hex Cell Transitions ───────────────────────────────────────────────── */
+/* Leaflet SVG paths receive fill/opacity via JS; CSS transitions smooth them */
+.leaflet-overlay-pane path {
+  transition: fill-opacity 0.15s ease, stroke-opacity 0.15s ease;
+}
+
+/* ─── Custom Marker Pin ──────────────────────────────────────────────────── */
 .custom-pin {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #246bff 0%, #4f8cff 100%);
-  border: 3px solid rgba(255, 255, 255, 0.96);
-  box-shadow: 0 8px 18px rgba(36, 107, 255, 0.35);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .map {
-    height: calc(100vh - 210px);
-    min-height: 400px;
-  }
-}
-
-@media (max-width: 768px) {
-  .map-frame {
-    padding: 10px;
-    border-radius: 20px;
-  }
-
-  .map {
-    height: calc(100vh - 230px);
-    min-height: 340px;
-    border-radius: 14px;
-  }
-
   .leaflet-control-zoom a {
     width: 34px !important;
     height: 34px !important;
@@ -93,9 +171,19 @@
   }
 }
 
-@media (max-width: 480px) {
-  .map {
-    height: calc(100vh - 250px);
-    min-height: 300px;
+@media (max-width: 768px) {
+  .leaflet-control-zoom {
+    border-radius: var(--radius-sm) !important;
+  }
+
+  .leaflet-control-zoom a {
+    width: 32px !important;
+    height: 32px !important;
+    line-height: 32px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .leaflet-control-attribution {
+    font-size: 10px !important;
   }
 }
